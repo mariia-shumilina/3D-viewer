@@ -1,0 +1,61 @@
+#version 330 core
+
+in vec3 fragPos;
+in vec2 texCoords;
+in vec3 normal;
+
+out vec4 fragColor;
+
+uniform sampler2D tex0;
+uniform vec3 lightPos1;
+uniform vec4 lightColor1;
+uniform vec3 lightPos2;
+uniform vec4 lightColor2;
+uniform vec3 viewPos;
+
+vec4 CalcLight(vec3 lightPos, vec4 lightColor)
+{
+    vec3 lightDir = normalize(lightPos - fragPos);
+    vec3 norm = normalize(normal);
+
+    // диффузна€ составл€юща€
+    float diff = max(dot(norm, lightDir), 0.0);
+    
+    // отраженна€ составл€юща€
+    float spec = 0.0f;
+    float shininess = 32.0;
+	if (diff != 0.0f)
+	{
+		float specularLight = 0.80f;
+		vec3 viewDir = normalize(viewPos - fragPos);
+		vec3 halfwayVec = normalize(viewDir + lightDir);
+		float specAmount = pow(max(dot(norm, halfwayVec), 0.0f), shininess);
+		spec = specAmount * specularLight;
+	};
+
+    // коэффициент затухани€
+    float constant = 1.0f,
+          linear = 0.35f,
+          quadratic = 0.44f;
+    float distance    = length(lightPos - fragPos);
+    float attenuation = 1.0 / (constant + linear * distance + 
+  			     quadratic * (distance * distance));    
+    
+    // собираем все вместе
+    
+    vec4 diffuse  = diff * lightColor;
+    vec4 specular = spec * lightColor;
+
+    return attenuation * (diffuse + specular); 
+
+} 
+
+void main() {	    
+    // фонова€ составл€юща€
+    float ambientIntensity = 0.2f;
+
+    vec4 objectColor = vec4(texture(tex0, texCoords).rgb, 1.0);
+    fragColor = objectColor * (ambientIntensity + 
+                               CalcLight(lightPos1, lightColor1) +
+                               CalcLight(lightPos2, lightColor2));
+}

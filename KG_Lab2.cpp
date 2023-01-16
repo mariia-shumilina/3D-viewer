@@ -26,7 +26,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
-const char brickTexPath[] = "D:\\Studies\\Graphics\\3DFigures\\bricktexture.jpg";
+const char brickTexPath[] = ".\\bricktexture.jpg";
 
 const unsigned int SCR_WIDTH = 1000;
 const unsigned int SCR_HEIGHT = 850;
